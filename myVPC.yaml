@@ -1,0 +1,63 @@
+ prod_VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      Tags:
+       - Key: Name
+         Value: prod_vpc
+
+
+# private subnet
+mySubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref prod_vpc
+      CidrBlock: 10.0.128.0/17
+      AvailabilityZone: "us-east-1a"
+      Tags:
+      - Key: Name
+        Value: prod_priv_sub  
+
+
+# public subnet
+mySubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref prod_vpc
+      CidrBlock: 10.0.64.0/18
+      AvailabilityZone: "us-east-1b"
+      Tags:
+      - Key: Name
+        Value: prod_pub_sub     
+
+# rt
+Type: AWS::EC2::RouteTable
+Properties:
+  Tags: 
+    - Key: Name
+      Value: prod_rt
+  VpcId: !Ref prod_vpc
+
+
+# rt association
+Type: AWS::EC2::SubnetRouteTableAssociation
+Properties:
+  RouteTableId: !Ref 
+  prod_rt
+  SubnetId: !Ref prod_pub_sub        
+
+Type: AWS::EC2::InternetGateway
+Properties:
+  Tags: 
+    - Key: Name
+        Value: Internet_Gateway      
+
+Type: AWS::EC2::VPCGatewayAttachment
+Properties:
+  InternetGatewayId: !Ref Internet_Gateway
+  VpcId: !Ref prod_vpc
+  VpnGatewayId: String    
+
+    
